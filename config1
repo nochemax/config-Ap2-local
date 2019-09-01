@@ -1,0 +1,89 @@
+
+Apache configuaracion Dominio LocalHost
+
+
+
+cd /etc/apache2/sites-available
+cp 000-default.conf prueba.com.conf
+leafpad prueba.com.conf
+
+<VirtualHost *:80>
+
+	ServerName www.prueba.com
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+
+	#Include conf-available/serve-cgi-bin.conf
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
+
+mkdir /var/www/prueba.com
+mkdir /var/log/apache2/prueba.com 
+leafpad /var/www/prueba.com/index.html
+
+
+cabecera html
+
+<html>
+  <head>
+    <title>prueba.com</title>
+  </head>
+  <body>
+    <h1>Sample page</h1>
+    This page is powered by Apache Virtual Host!
+  </body>
+</html>
+
+chown -R www-data:www-data /var/www/prueba.com
+
+leafpad /etc/hosts
+
+ip prueba.com
+ip www.prueba.com
+
+leafpad ports.conf
+
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+NameVirtualHost www.prueba.com:80
+
+Listen 80
+#Listen 443
+#Listen 8080
+
+<IfModule ssl_module>
+	Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+	Listen 443
+</IfModule>
+
+
+cd sites-enabled
+ln -s ../sites-available/prueba.com.conf .
+a2ensite prueba.com.conf
+
+modo1 error kali2 ejecute con ctl
+/etc/init.d/apache2 start
+service apache2 start
+
+modo2 kali2
+systemctl start apache2
+service apache2 start
+apache2ctl -t
+systemctl reload apache2
+service apache2 reload
+
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+/etc/init.d/iptables save
+
+apache2ctl configtest    comprobacion
